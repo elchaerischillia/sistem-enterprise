@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\DepartmentsController;
 
@@ -40,6 +41,8 @@ Route::resource('roles', RoleController::class);
 Route::resource('departments', DepartmentsController::class);
 
 Route::resource('employees', EmployeesController::class);
+
+Route::resource('payroll', PayrollController::class);
 
 
 

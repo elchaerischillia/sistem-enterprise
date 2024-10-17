@@ -59,7 +59,7 @@
                                 </a>
                             </li>
                             <li class="menu-item">
-                                <a href="#" class="menu-link">
+                                <a href="{{ route ('payroll.index') }}" class="menu-link">
                                     <div>Payroll</div>
                                 </a>
                             </li>

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEmployeesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -13,25 +13,18 @@ class CreateEmployeesTable extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('depart_id'); // Foreign key ke tabel departments
-            $table->unsignedBigInteger('user_id'); // Foreign key ke tabel users
+            $table->foreignId('user_id')->constrained()->onDelete('CASCADE');
+            $table->foreignId('department_id')->constrained()->onDelete('restrict');
             $table->string('address');
-            $table->string('place_of_birth');
-            $table->date('dob');
-            $table->string('religion');
-            $table->enum('sex', ['male', 'female']);
+            $table->string('place_of_birth')->nullable();
+            $table->date('dob')->nullable();
+            $table->enum('religion',['islam', 'Katolik', 'Protestan', 'Hindu', 'Budha', 'Konghucu']);
+            $table->enum('sex', ['Male', 'Female']);
             $table->string('phone');
-            $table->decimal('salary', 10, 2);
+            $table->string('salary');
             $table->timestamps();
-    
-            // Foreign key constraint untuk depart_id
-            $table->foreign('depart_id')->references('id')->on('departments')->onDelete('cascade');
-            
-            // Foreign key constraint untuk user_id
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
-    
 
     /**
      * Reverse the migrations.
@@ -40,4 +33,4 @@ class CreateEmployeesTable extends Migration
     {
         Schema::dropIfExists('employees');
     }
-}
+};

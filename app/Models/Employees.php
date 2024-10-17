@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Employees;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Employee extends Model
+class Employees extends Model
 {
-    use HasFactory;
+    use HasFactory, HasRoles;
 
+    // Kolom-kolom yang dapat diisi melalui mass assignment
     protected $fillable = [
         'user_id',
         'depart_id',
@@ -21,8 +24,19 @@ class Employee extends Model
         'salary',
     ];
 
-    // Relasi ke department: Setiap employee hanya punya satu department
-    public function department() {
-        return $this->belongsTo(Departments::class, 'depart_id'); // Foreign key adalah 'depart_id'
+    /**
+     * Definisi relasi dengan model User.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Definisi relasi dengan model Department.
+     */
+    public function department()
+    {
+        return $this->belongsTo(Departments::class, );
     }
 }

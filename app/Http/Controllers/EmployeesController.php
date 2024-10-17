@@ -1,74 +1,117 @@
 <?php
+
 namespace App\Http\Controllers;
 
-use App\Models\Employee;
-use App\Models\Department; // Nama model singular
+use App\Models\Employees;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Models\Departments;
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class EmployeesController extends Controller
 {
-    // Tampilkan semua employee beserta departemennya
-    public function index() {
-        // Mengambil semua data employee beserta data departemen terkait
-        $employees = Employee::with('department')->get();
-
-        // Menampilkan data di view 'admin.employees.index'
+    public function index()
+    {
+        // Fetch employees with their related users and departments
+        $employees = Employees::with(['user', 'department'])->paginate(10);
+        
         return view('admin.employees.index', compact('employees'));
     }
 
-    // Tampilkan form untuk membuat employee baru
-    public function create() {
-        $departments = Department::all(); // Ambil semua department untuk digunakan dalam form
-        return view('admin.employees.create', compact('departments'));
+    public function create()
+    {
+        $users = User::select('id', 'name')->get();
+        $departments = Departments::select('id', 'name')->get();
+
+        return view('admin.employees.create', compact('users', 'departments'));
     }
 
-    // Simpan employee baru
-    public function store(Request $request) {
-        $validated = $request->validate([
-            'user_id' => 'required|integer|exists:users,id', // Validasi user_id harus ada di tabel users
-            'depart_id' => 'required|integer|exists:departments,id', // Validasi departemen harus ada
+    public function store(Request $request)
+{
+    // Validasi input
+    $request->validate([
+        'user_id' => 'required|exists:users,id',
+        'department_id' => 'required|exists:departments,id',
+        'address' => 'required|string|max:255',
+        'place_of_birth' => 'nullable|string|max:255',
+        'dob' => 'nullable|date',
+        'religion' => 'required|in:Islam,Katolik,Protestan,Hindu,Budha,Konghucu',
+        'sex' => 'required|in:Male,Female',
+        'phone' => 'required|string|max:15',
+        'salary' => 'required|numeric',
+    ]);
+
+    // Insert employee baru ke dalam database
+    DB::table('employees')->insert([
+        'user_id' => $request->user_id,
+        'department_id' => $request->department_id,
+        'address' => $request->address,
+        'place_of_birth' => $request->place_of_birth,
+        'dob' => $request->dob,
+        'religion' => $request->religion,
+        'sex' => $request->sex,
+        'phone' => $request->phone,
+        'salary' => $request->salary,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    // Redirect dengan pesan sukses
+    return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
+}
+
+
+    public function edit($id)
+    {
+        $employees = Employees::findOrFail($id);
+        $users = User::select('id', 'name')->get();
+        $departments = Departments::select('id', 'name')->get();
+
+        return view('admin.employees.edit', compact('employees', 'users', 'departments'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'department_id' => 'required|exists:departments,id',
             'address' => 'required|string|max:255',
-            'place_of_birth' => 'required|string|max:255',
-            'dob' => 'required|date',
-            'religion' => 'required|string|max:50',
-            'sex' => 'required|in:male,female',
-            'phone' => 'required|string|max:20',
+            'place_of_birth' => 'nullable|string|max:255',
+            'dob' => 'nullable|date',
+            'religion' => 'required|in:Islam,Katolik,Protestan,Hindu,Budha,Konghucu',
+            'sex' => 'required|in:Male,Female',
+            'phone' => 'required|string|max:15',
             'salary' => 'required|numeric',
         ]);
-
-        Employee::create($validated); // Simpan data employee baru
-
-        return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
-    }
-
-    // Tampilkan form untuk mengedit employee
-    public function edit(Employee $employee) {
-        $departments = Department::all(); // Ambil semua department untuk dropdown
-        return view('admin.employees.edit', compact('employee', 'departments'));
-    }
-
-    // Update employee yang ada
-    public function update(Request $request, Employee $employee) {
-        $validated = $request->validate([
-            'user_id' => 'required|integer|exists:users,id', // Validasi user_id
-            'depart_id' => 'required|integer|exists:departments,id',
-            'address' => 'required|string|max:255',
-            'place_of_birth' => 'required|string|max:255',
-            'dob' => 'required|date',
-            'religion' => 'required|string|max:50',
-            'sex' => 'required|in:male,female',
-            'phone' => 'required|string|max:20',
-            'salary' => 'required|numeric',
+    
+        // Update employee berdasarkan ID
+        DB::table('employees')->where('id', $id)->update([
+            'user_id' => $request->user_id,
+            'department_id' => $request->department_id,
+            'address' => $request->address,
+            'place_of_birth' => $request->place_of_birth,
+            'dob' => $request->dob,
+            'religion' => $request->religion,
+            'sex' => $request->sex,
+            'phone' => $request->phone,
+            'salary' => $request->salary,
+            'updated_at' => now(),
         ]);
-
-        $employee->update($validated); // Update data employee
-
+    
+        // Redirect dengan pesan sukses
         return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
     }
+    
 
-    // Hapus employee
-    public function destroy(Employee $employee) {
-        $employee->delete(); // Hapus employee
+    public function destroy($id)
+    {
+        // Hapus employee berdasarkan ID
+        DB::table('employees')->where('id', $id)->delete();
+    
+        // Redirect dengan pesan sukses
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
     }
+    
 }

@@ -2,55 +2,75 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Departments;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 
 class DepartmentsController extends Controller
 {
-    // Tampilkan semua department
-    public function index() {
-        $departments = Departments::all();
+    public function index()
+    {
+        // Fetch departments using query builder and paginate
+        $departments = DB::table('departments')->paginate(10); // Adjust the number of items per page
         return view('admin.departments.index', compact('departments'));
     }
 
-    // Tampilkan form untuk membuat department baru
-    public function create() {
+    public function create()
+    {
         return view('admin.departments.create');
     }
 
-    // Simpan department baru
-    public function store(Request $request) {
-        $validated = $request->validate([
+    public function store(Request $request)
+    {
+        $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
-        Departments::create($validated);
+        // Insert the new department into the database
+        DB::table('departments')->insert([
+            'name' => $request->name,
+            'description' => $request->description,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
         return redirect()->route('departments.index')->with('success', 'Department created successfully.');
     }
 
-    // Tampilkan form untuk mengedit department
-    public function edit(Departments $department) {
-        return view('admin.departments.edit', compact('department'));
+    public function edit($id)
+    {
+        // Fetch the department by ID
+        $departments = DB::table('departments')->where('id', $id)->first();
+        
+        if (!$departments) {
+            return redirect()->route('departments.index')->with('error', 'Department not found.');
+        }
+
+        return view('admin.departments.edit', compact('departments'));
     }
 
-    // Update department yang ada
-    public function update(Request $request, Departments $department) {
-        $validated = $request->validate([
+    public function update(Request $request, $id)
+    {
+        $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
 
-        $department->update($validated);
+        // Update the department
+        DB::table('departments')->where('id', $id)->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'updated_at' => now(),
+        ]);
 
         return redirect()->route('departments.index')->with('success', 'Department updated successfully.');
     }
 
-    // Hapus department
-    public function destroy(Departments $department) {
-        $department->delete();
+    public function destroy($id)
+    {
+        // Delete the department by ID
+        DB::table('departments')->where('id', $id)->delete();
+
         return redirect()->route('departments.index')->with('success', 'Department deleted successfully.');
     }
 }

@@ -54,7 +54,7 @@
                                 </a>
                             </li>                            
                             <li class="menu-item">
-                                <a href="#" class="menu-link">
+                                <a href="{{ route ('employees.index') }}" class="menu-link">
                                     <div>Employees</div>
                                 </a>
                             </li>
@@ -177,7 +177,7 @@
                                             <span class="align-middle">Log Out</span>
                                         </a>
                                         
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                        <form id="logout-form" action="" method="POST" style="display: none;">
                                             @csrf
                                         </form>
                                         

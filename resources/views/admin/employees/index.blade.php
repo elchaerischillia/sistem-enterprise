@@ -2,53 +2,63 @@
 
 @section('content')
 <div class="container">
-    <h3>Employees</h3>
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">Employees</h1>
 
-    <a href="{{ route('employees.create') }}" class="btn btn-primary mb-3">Tambah Employee</a>
+            <!-- Add New Employee Button -->
+            <a href="{{ route('employees.create') }}" class="btn btn-primary mb-3 float-right">
+                Add Employee
+            </a>
 
-    <table class="table table-sm table-striped">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Name</th>
-                <th>Department</th>
-                <th>Address</th>
-                <th>Place of Birth</th>
-                <th>Date of Birth</th>
-                <th>Religion</th>
-                <th>Gender</th>
-                <th>Phone</th>
-                <th>Salary</th>
-                <th>Actions</th> <!-- Kolom aksi untuk edit dan delete -->
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($employees as $employee)
-                <tr>
-                    <td>{{ $loop->iteration }}</td> <!-- Iterasi untuk penomoran -->
-                    <td>{{ $employee->user->name }}</td> <!-- Menampilkan nama user -->
-                    <td>{{ $employee->department->name }}</td> <!-- Menampilkan nama department -->
-                    <td>{{ $employee->address }}</td> <!-- Menampilkan alamat -->
-                    <td>{{ $employee->place_of_birth }}</td> <!-- Menampilkan tempat lahir -->
-                    <td>{{ $employee->dob->format('d-m-Y') }}</td> <!-- Menampilkan tanggal lahir -->
-                    <td>{{ $employee->religion }}</td> <!-- Menampilkan agama -->
-                    <td>{{ $employee->sex }}</td> <!-- Menampilkan jenis kelamin -->
-                    <td>{{ $employee->phone }}</td> <!-- Menampilkan nomor telepon -->
-                    <td>{{ number_format($employee->salary, 2) }}</td> <!-- Menampilkan gaji -->
-                    <td>
-                        <!-- Edit Button -->
-                        <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-warning">Edit</a>
+            <!-- Search Field -->
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Search..." id="search">
+            </div>
 
-                        <!-- Delete Button -->
-                        <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" style="display:inline-block;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this employee?')">Delete</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+            <!-- Employees Table -->
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Phone</th>
+                        <th>Salary</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($employees as $key => $employee)
+                        <tr>
+                            <td>{{ $key + 1 }}</td>
+                            <td>{{ $employee->user->name ?? 'N/A' }}</td>
+                            <td>{{ $employee->department->name ?? 'N/A' }}</td>
+                            <td>{{ $employee->phone }}</td>
+                            <td>{{ number_format($employee->salary, 2) }}</td> <!-- Format salary to two decimal places -->
+                            <td>
+                                <!-- Edit Button -->
+                                <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-warning btn-sm">Edit</a>
+
+                                <!-- Delete Button -->
+                                <form action="{{ route('employees.destroy', $employee->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this employee?')">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center">No employees found.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+
+            <!-- Pagination (optional) -->
+            {{ $employees->links() }}
+        </div>
+    </div>
 </div>
 @endsection

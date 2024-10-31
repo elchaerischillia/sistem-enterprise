@@ -64,15 +64,36 @@
                                 </a>
                             </li>
                             <li class="menu-item">
-                                <a href="#" class="menu-link">
+                                <a href="{{ route ('Leave.index') }}" class="menu-link">
                                     <div>Leave</div>
                                 </a>
                             </li>
                             <li class="menu-item">
-                                <a href="#" class="menu-link">
-                                    <div>Presence</div>
+                                <a href="{{ route ('attendance.index') }}" class="menu-link">
+                                    <div>Attendances</div>
                                 </a>
                             </li>
+                            <li class="menu-item">
+                                <a href="#" class="menu-link menu-toggle">
+                                    <i class="menu-icon tf-icons bx bx-user"></i>
+                                    <div data-i18n="CRM">Customer Relationship Management</div>
+                                </a>
+                                <ul class="menu-sub">
+                                    <li class="menu-item">
+                                        <a href="{{ route('customers.index') }}" class="menu-link">
+                                            <div>Customers</div>
+                                        </a>
+                                    </li>
+                                    <li class="menu-item">
+                                        <a href="{{ route('promotions.index') }}" class="menu-link">
+                                            <div>Promotions</div>
+                                        </a>
+                                    </li>
+                                    <li class="menu-item">
+                                        <a href="{{ route('send_promotions.create') }}" class="menu-link">
+                                            <div>Send Promotion</div>
+                                        </a>
+                                      </li>
                         </ul>
                     </li>
                     <li class="menu-item">
